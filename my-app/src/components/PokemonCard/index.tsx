@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import styles from "./PokemonCard.module.scss";
 
 interface IPokemon {
   name: string;
@@ -29,8 +30,10 @@ export const PokemonCard: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.container}>
       <input
+        className={styles.effect_1}
+        type="text"
         placeholder="Enter Pokemon Name"
         onChange={(event) => setQuery(event.target.value)}
       />
