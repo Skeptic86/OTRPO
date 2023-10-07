@@ -13,14 +13,14 @@ export const fetchPokemons = createAsyncThunk(
     async (params: TPokemonsParams, thunkApi) => {
         const url = `https://pokeapi.co/api/v2/pokemon?page=10&limit=${params.limit}`;
         const { data } = await axios.get<IResult>(url);
-        console.log(data);
+
         const pokemonsData: IPokemon[] = await Promise.all(
             data.results.map(async (pokemon) => {
                 const pokemonFullInfo = await axios.get(pokemon.url);
                 return pokemonFullInfo.data;
             })
         );
-        console.log(pokemonsData);
+
         return pokemonsData;
     }
 );
