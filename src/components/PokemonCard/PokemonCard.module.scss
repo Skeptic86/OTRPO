@@ -1,18 +1,18 @@
 .card {
   display: inline-block;
-  width: 200px;
-  height: 300px;
+  width: 350px;
+  height: 400px;
   margin: 0 0 10px 10px;
   background-color: #bfbfbf;
   border: 2px solid #000;
 }
 
-.pokemon_img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;
-  height: 80%;
+h2,
+p {
+  font-family: "Courier New", Courier, monospace;
+  color: #000;
+  margin: 0;
+  padding: 0px 0px 6px 0px;
 }
 
 .pokemon_name {
@@ -20,6 +20,30 @@
   text-align: center;
   margin-top: 10px;
   margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.pokemon_img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  height: 50%;
+}
+
+.pokemon_info {
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: start;
+  margin-bottom: 15px;
+  font-weight: normal;
+
+  p {
+    color: black;
+  }
 }
 
 input {

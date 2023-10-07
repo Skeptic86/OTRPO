@@ -4,24 +4,29 @@ import styles from "./PokemonCard.module.scss";
 import IPokemon from "../../types/pokemon.interface";
 
 interface IPokemonCardProps {
-    pokemon: IPokemon;
+  pokemon: IPokemon;
 }
 
 const PokemonCard: React.FC<IPokemonCardProps> = ({ pokemon }) => {
-    return (
-        <div className={styles.card}>
-            <img
-                className={styles.pokemon_img}
-                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
-                    pokemon.id + 1
-                }.png`}
-                alt="pokemon_img"
-            />
-            <h2 className={styles.pokemon_name}>{pokemon.name}</h2>
-            <h2 className={styles.pokemon_name}>height: {pokemon.height}</h2>
-            <h2 className={styles.pokemon_name}>weight: {pokemon.weight}</h2>
-        </div>
-    );
+  return (
+    <div className={styles.card}>
+      <img
+        className={styles.pokemon_img}
+        src={pokemon.sprites.front_default}
+        alt="pokemon_img"
+      />
+      <h2 className={styles.pokemon_name}>{pokemon.name}</h2>
+      <div className={styles.pokemon_info}>
+        {pokemon.abilities.map((ability, i) => (
+          <p key={i} className={styles.pokemon_ability}>{`Способность ${
+            i + 1
+          }: ${ability.ability.name}`}</p>
+        ))}
+        <p className={styles.pokemon_ability}>height: {pokemon.height}</p>
+        <p className={styles.pokemon_ability}>weight: {pokemon.weight}</p>
+      </div>
+    </div>
+  );
 };
 
 export default PokemonCard;

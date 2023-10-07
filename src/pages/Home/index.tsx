@@ -11,15 +11,19 @@ import {
   fetchPokemons,
   selectPokemonData,
 } from "../../redux/slices/pokemonSlice";
+import { setQuery } from "../../redux/slices/querySlice";
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items, status } = useSelector(selectPokemonData);
 
-  const [query, setQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = React.useState<number>(0);
   const getPokemons = async (limit: number = 100) => {
     dispatch(fetchPokemons({ limit }));
+  };
+
+  const onChangeInput = (query: string) => {
+    dispatch(setQuery(query));
   };
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const Home: React.FC = () => {
         className={styles.effect_1}
         type="text"
         placeholder="Enter Pokemon Name"
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => onChangeInput(event.target.value)}
       />
       <div className="pokemons">
         {/* {pokemons

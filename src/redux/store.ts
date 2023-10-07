@@ -1,9 +1,10 @@
+import query from "./slices/querySlice";
 import { configureStore } from "@reduxjs/toolkit";
 import pokemon from "./slices/pokemonSlice";
 import { useDispatch } from "react-redux";
 
 export const store = configureStore({
-  reducer: { pokemon },
+  reducer: { pokemon, query },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
