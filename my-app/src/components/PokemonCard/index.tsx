@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./PokemonCard.module.scss";
 import IPokemon from "../../types/pokemon.interface";
 
-export const PokemonCard: React.FC<IPokemon> = ({ name, id, sprites }) => {
+const PokemonCard: React.FC<IPokemon> = ({ name, id, sprites }) => {
   return (
     <div className={styles.card}>
       <img
@@ -17,3 +17,5 @@ export const PokemonCard: React.FC<IPokemon> = ({ name, id, sprites }) => {
     </div>
   );
 };
+
+export default PokemonCard;

@@ -1,49 +1,79 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import ReactPaginate from "react-paginate";
 
 import styles from "./PokemonList.module.scss";
 import IPokemon from "../../types/pokemon.interface";
-import IResult from "../../types/result.interface";
-import { PokemonCard } from "../PokemonCard";
+import PokemonCard from "../PokemonCard";
 
-export const PokemonList: React.FC = () => {
-  const [pokemons, setPokemons] = React.useState<IPokemon[]>();
-  const [query, setQuery] = useState<string>("");
-  const getPokemons = async (limit: number = 100) => {
-    const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=0`;
-    const { data } = await axios.get<IResult>(url);
-    console.log(data);
-    setPokemons(data.results);
-    return data.results;
-  };
+const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
-  useEffect(() => {
-    getPokemons();
-  }, []);
+type PaginationProps = {
+  onChangePage: (page: number) => void;
+  currentPage: number;
+  pokemons: IPokemon[];
+};
 
-  //   const pokemonCards = pokemons?.map((val: any) => (
-  //     <PokemonCard key={val.id} {...val} />
-  //   ));
-
+const Items: React.FC<any> = ({ currentItems }) => {
   return (
-    <div className={styles.container}>
-      <input
-        className={styles.effect_1}
-        type="text"
-        placeholder="Enter Pokemon Name"
-        onChange={(event) => setQuery(event.target.value)}
-      />
-      {pokemons
-        ?.filter((pokemon) => {
-          if (query === "") {
-            return pokemon;
-          } else if (pokemon.name.toLowerCase().includes(query.toLowerCase())) {
-            return pokemon;
-          }
-        })
-        .map((pokemon, i) => (
+    <>
+      {currentItems
+        // ?.filter((pokemon: IPokemon) => {
+        //   if ("query" === "") {
+        //     return pokemon;
+        //   } else if (
+        //     pokemon.name.toLowerCase().includes(query.toLowerCase())
+        //   ) {
+        //     return pokemon;
+        //   }
+        // })
+        .map((pokemon: IPokemon, i: number) => (
           <PokemonCard key={i} name={pokemon.name} id={i} />
         ))}
-    </div>
+    </>
   );
 };
+
+const PokemonList: React.FC<PaginationProps> = ({
+  onChangePage,
+  pokemons,
+  currentPage,
+}) => {
+  // Here we use item offsets; we could also use page offsets
+  // following the API or data you're working with.
+  const [itemOffset, setItemOffset] = React.useState(0);
+
+  // Simulate fetching items from another resources.
+  // (This could be items from props; or items loaded in a local state
+  // from an API endpoint with useEffect and useState)
+  const endOffset = itemOffset + 10;
+  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  const currentItems = pokemons.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(pokemons.length / 10);
+
+  // Invoke when user click to request another page.
+  const handlePageClick = (event: any) => {
+    const newOffset = (event.selected * 10) % pokemons.length;
+    console.log(
+      `User requested page number ${event.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
+  };
+
+  return (
+    <>
+      <Items currentItems={currentItems} />
+      <ReactPaginate
+        className={styles.root}
+        breakLabel="..."
+        nextLabel=">"
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel="<"
+        renderOnZeroPageCount={null}
+      />
+    </>
+  );
+};
+
+export default PokemonList;

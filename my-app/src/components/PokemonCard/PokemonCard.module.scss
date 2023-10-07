@@ -1,8 +1,8 @@
 .card {
+  display: inline-block;
   width: 200px;
   height: 300px;
-  margin: 0 auto;
-  margin-top: 5px;
+  margin: 0 0 10px 10px;
   background-color: #bfbfbf;
   border: 2px solid #000;
 }
@@ -22,18 +22,12 @@
   margin-bottom: 10px;
 }
 
-.container {
-  font-family: sans-serif;
-  font-size: 24px;
-  margin: 0 auto;
-  max-width: 1200px;
-}
-
 input {
   font: 15px/24px "Muli", sans-serif;
   color: #333;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 25px;
 }
 
 :focus {
@@ -44,20 +38,4 @@ input {
   border: 0;
   padding: 7px 0;
   border-bottom: 1px solid #ccc;
-}
-
-ul {
-  position: relative;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 300px;
-}
-
-/* List element */
-li {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  box-sizing: border-box;
 }
