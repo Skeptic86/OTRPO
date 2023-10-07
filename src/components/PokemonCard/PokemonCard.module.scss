@@ -1,0 +1,41 @@
+.card {
+  display: inline-block;
+  width: 200px;
+  height: 300px;
+  margin: 0 0 10px 10px;
+  background-color: #bfbfbf;
+  border: 2px solid #000;
+}
+
+.pokemon_img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  height: 80%;
+}
+
+.pokemon_name {
+  font-size: 18px;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+input {
+  font: 15px/24px "Muli", sans-serif;
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 25px;
+}
+
+:focus {
+  outline: none;
+}
+
+.effect_1 {
+  border: 0;
+  padding: 7px 0;
+  border-bottom: 1px solid #ccc;
+}
