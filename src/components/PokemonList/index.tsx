@@ -54,10 +54,9 @@ const PokemonList: React.FC<PaginationProps> = ({
 
     // Invoke when user click to request another page.
     const handlePageClick = (event: any) => {
-        console.log(event.selected);
         onChangePage(event.selected);
     };
-    console.log();
+
     return (
         <>
             <Items currentItems={pokemons} />

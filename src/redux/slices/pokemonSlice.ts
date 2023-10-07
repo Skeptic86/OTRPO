@@ -19,7 +19,6 @@ export const fetchPokemons = createAsyncThunk(
                 limit: params.limit,
             },
         });
-        console.log(data);
 
         const pokemonsData: IPokemon[] = await Promise.all(
             data.results.map(async (pokemon) => {

@@ -33,7 +33,6 @@ const Home: React.FC = () => {
     }, [currentPage, dispatch]);
 
     const onChangePage = (page: number) => {
-        console.log();
         setCurrentPage(page);
     };
 
