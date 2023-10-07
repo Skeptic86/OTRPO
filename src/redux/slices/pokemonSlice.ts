@@ -6,13 +6,20 @@ import IResult from "../../types/result.interface";
 
 type TPokemonsParams = {
     limit: number;
+    offset: number;
 };
 
 export const fetchPokemons = createAsyncThunk(
     "pokemons/fetchPokemon",
     async (params: TPokemonsParams, thunkApi) => {
-        const url = `https://pokeapi.co/api/v2/pokemon?page=10&limit=${params.limit}`;
-        const { data } = await axios.get<IResult>(url);
+        const url = `https://pokeapi.co/api/v2/pokemon`;
+        const { data } = await axios.get<IResult>(url, {
+            params: {
+                offset: params.offset,
+                limit: params.limit,
+            },
+        });
+        console.log(data);
 
         const pokemonsData: IPokemon[] = await Promise.all(
             data.results.map(async (pokemon) => {
@@ -21,7 +28,7 @@ export const fetchPokemons = createAsyncThunk(
             })
         );
 
-        return pokemonsData;
+        return { pokemonsData, count: data.count };
     }
 );
 
@@ -33,11 +40,18 @@ enum Status {
 
 interface IPokemonSliceState {
     items: IPokemon[];
+    count: number;
     status: Status;
+}
+
+interface IResponseData {
+    pokemonsData: IPokemon[];
+    count: number;
 }
 
 const initialState: IPokemonSliceState = {
     items: [],
+    count: 0,
     status: Status.LOADING, // loading | success | error
 };
 
@@ -57,8 +71,9 @@ export const pokemonSlice = createSlice({
 
         builder.addCase(
             fetchPokemons.fulfilled,
-            (state, action: PayloadAction<IPokemon[]>) => {
-                state.items = action.payload;
+            (state, action: PayloadAction<IResponseData>) => {
+                state.items = action.payload.pokemonsData;
+                state.count = action.payload.count;
                 state.status = Status.SUCCESS;
             }
         );

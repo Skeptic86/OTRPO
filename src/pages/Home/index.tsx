@@ -8,42 +8,45 @@ import PokemonCard from "../../components/PokemonCard";
 import PokemonList from "../../components/PokemonList";
 import { useAppDispatch } from "../../redux/store";
 import {
-  fetchPokemons,
-  selectPokemonData,
+    fetchPokemons,
+    selectPokemonData,
 } from "../../redux/slices/pokemonSlice";
 import { setQuery } from "../../redux/slices/querySlice";
 
 const Home: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { items, status } = useSelector(selectPokemonData);
+    const dispatch = useAppDispatch();
+    const { items, status } = useSelector(selectPokemonData);
 
-  const [currentPage, setCurrentPage] = React.useState<number>(0);
-  const getPokemons = async (limit: number = 100) => {
-    dispatch(fetchPokemons({ limit }));
-  };
+    const limit = 10;
+    const [currentPage, setCurrentPage] = React.useState<number>(0);
 
-  const onChangeInput = (query: string) => {
-    dispatch(setQuery(query));
-  };
+    const onChangeInput = (query: string) => {
+        dispatch(setQuery(query));
+    };
 
-  useEffect(() => {
-    getPokemons();
-  }, []);
+    useEffect(() => {
+        const getPokemons = async () => {
+            const offset = currentPage * limit;
+            dispatch(fetchPokemons({ limit, offset }));
+        };
+        getPokemons();
+    }, [currentPage, dispatch]);
 
-  const onChangePage = (page: number) => {
-    setCurrentPage(page);
-  };
+    const onChangePage = (page: number) => {
+        console.log();
+        setCurrentPage(page);
+    };
 
-  return (
-    <div className={styles.container}>
-      <input
-        className={styles.effect_1}
-        type="text"
-        placeholder="Enter Pokemon Name"
-        onChange={(event) => onChangeInput(event.target.value)}
-      />
-      <div className="pokemons">
-        {/* {pokemons
+    return (
+        <div className={styles.container}>
+            <input
+                className={styles.effect_1}
+                type="text"
+                placeholder="Enter Pokemon Name"
+                onChange={(event) => onChangeInput(event.target.value)}
+            />
+            <div className="pokemons">
+                {/* {pokemons
           ?.filter((pokemon) => {
             if (query === "") {
               return pokemon;
@@ -56,16 +59,17 @@ const Home: React.FC = () => {
           .map((pokemon, i) => (
             <PokemonCard key={i} name={pokemon.name} id={i} />
           ))} */}
-        {items && (
-          <PokemonList
-            pokemons={items}
-            currentPage={currentPage}
-            onChangePage={onChangePage}
-          />
-        )}
-      </div>
-    </div>
-  );
+                {items && (
+                    <PokemonList
+                        pokemons={items}
+                        currentPage={currentPage}
+                        onChangePage={onChangePage}
+                        limit={limit}
+                    />
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default Home;
