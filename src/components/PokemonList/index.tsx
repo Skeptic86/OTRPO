@@ -4,8 +4,13 @@ import ReactPaginate from "react-paginate";
 import styles from "./PokemonList.module.scss";
 import IPokemon from "../../types/pokemon.interface";
 import PokemonCard from "../PokemonCard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectQuery } from "../../redux/slices/querySlice";
+import { useAppDispatch } from "../../redux/store";
+import {
+  choosePokemon,
+  selectChoosenPokemon,
+} from "../../redux/slices/pokemonSlice";
 
 const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -20,21 +25,35 @@ interface IItemsProps {
 }
 
 const Items: React.FC<IItemsProps> = ({ currentItems }) => {
+  const dispatch = useAppDispatch();
   const { query } = useSelector(selectQuery);
+
+  const onPokemonButtonClick = (pokemon: IPokemon) => {
+    dispatch(choosePokemon(pokemon));
+  };
+
   return (
-    <>
-      {currentItems
-        ?.filter((pokemon: IPokemon) => {
-          if (query === "") {
-            return pokemon;
-          } else if (pokemon.name.toLowerCase().includes(query.toLowerCase())) {
-            return pokemon;
-          }
-        })
-        .map((pokemon) => (
-          <PokemonCard key={pokemon.id} pokemon={pokemon} />
-        ))}
-    </>
+    <div className={styles.pokemon_wrapper__outer}>
+      <div className={styles.pokemon_wrapper__inner}>
+        {currentItems
+          ?.filter((pokemon: IPokemon) => {
+            if (query === "") {
+              return pokemon;
+            } else if (
+              pokemon.name.toLowerCase().includes(query.toLowerCase())
+            ) {
+              return pokemon;
+            }
+          })
+          .map((pokemon) => (
+            <PokemonCard
+              onPokemonButtonClick={onPokemonButtonClick}
+              key={pokemon.id}
+              pokemon={pokemon}
+            />
+          ))}
+      </div>
+    </div>
   );
 };
 

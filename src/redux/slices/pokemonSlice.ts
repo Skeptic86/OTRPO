@@ -5,73 +5,80 @@ import IPokemon from "../../types/pokemon.interface";
 import IResult from "../../types/result.interface";
 
 type TPokemonsParams = {
-    limit: number;
+  limit: number;
 };
 
 export const fetchPokemons = createAsyncThunk(
-    "pokemons/fetchPokemon",
-    async (params: TPokemonsParams, thunkApi) => {
-        const url = `https://pokeapi.co/api/v2/pokemon?page=10&limit=${params.limit}`;
-        const { data } = await axios.get<IResult>(url);
+  "pokemons/fetchPokemon",
+  async (params: TPokemonsParams, thunkApi) => {
+    const url = `https://pokeapi.co/api/v2/pokemon?page=10&limit=${params.limit}`;
+    const { data } = await axios.get<IResult>(url);
 
-        const pokemonsData: IPokemon[] = await Promise.all(
-            data.results.map(async (pokemon) => {
-                const pokemonFullInfo = await axios.get(pokemon.url);
-                return pokemonFullInfo.data;
-            })
-        );
+    const pokemonsData: IPokemon[] = await Promise.all(
+      data.results.map(async (pokemon) => {
+        const pokemonFullInfo = await axios.get(pokemon.url);
+        return pokemonFullInfo.data;
+      })
+    );
 
-        return pokemonsData;
-    }
+    return pokemonsData;
+  }
 );
 
 enum Status {
-    LOADING = "loading",
-    SUCCESS = "success",
-    ERROR = "error",
+  LOADING = "loading",
+  SUCCESS = "success",
+  ERROR = "error",
 }
 
 interface IPokemonSliceState {
-    items: IPokemon[];
-    status: Status;
+  pokemons: IPokemon[];
+  status: Status;
+  choosenPokemon?: IPokemon;
 }
 
 const initialState: IPokemonSliceState = {
-    items: [],
-    status: Status.LOADING, // loading | success | error
+  pokemons: [],
+  status: Status.LOADING, // loading | success | error
 };
 
 export const pokemonSlice = createSlice({
-    name: "pokemon",
-    initialState,
-    reducers: {
-        setItems(state, action: PayloadAction<IPokemon[]>) {
-            state.items = action.payload;
-        },
+  name: "pokemon",
+  initialState,
+  reducers: {
+    setpokemons(state, action: PayloadAction<IPokemon[]>) {
+      state.pokemons = action.payload;
     },
-    extraReducers: (builder) => {
-        builder.addCase(fetchPokemons.pending, (state) => {
-            state.status = Status.LOADING;
-            state.items = [];
-        });
-
-        builder.addCase(
-            fetchPokemons.fulfilled,
-            (state, action: PayloadAction<IPokemon[]>) => {
-                state.items = action.payload;
-                state.status = Status.SUCCESS;
-            }
-        );
-
-        builder.addCase(fetchPokemons.rejected, (state) => {
-            state.status = Status.ERROR;
-            state.items = [];
-        });
+    choosePokemon(state, action: PayloadAction<IPokemon>) {
+      state.choosenPokemon = action.payload;
+      console.log(state.choosenPokemon);
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchPokemons.pending, (state) => {
+      state.status = Status.LOADING;
+      state.pokemons = [];
+    });
+
+    builder.addCase(
+      fetchPokemons.fulfilled,
+      (state, action: PayloadAction<IPokemon[]>) => {
+        state.pokemons = action.payload;
+        state.status = Status.SUCCESS;
+      }
+    );
+
+    builder.addCase(fetchPokemons.rejected, (state) => {
+      state.status = Status.ERROR;
+      state.pokemons = [];
+    });
+  },
 });
 
 export const selectPokemonData = (state: RootState) => state.pokemon;
+export const selectChoosenPokemon = (state: RootState) =>
+  state.pokemon.choosenPokemon;
 // Action creators are generated for each case reducer function
-export const { setItems } = pokemonSlice.actions;
+export const { setpokemons, choosePokemon } = pokemonSlice.actions;
 
 export default pokemonSlice.reducer;

@@ -13,8 +13,16 @@ export default interface IPokemon {
   order: number;
   species: object;
   sprites: ISprites;
-  stats: object[];
+  stats: IStats[];
   types: object[];
+}
+
+export interface IStats {
+  base_stat: number;
+  effort: number;
+  stat: {
+    name: string;
+  };
 }
 
 interface ISprites {

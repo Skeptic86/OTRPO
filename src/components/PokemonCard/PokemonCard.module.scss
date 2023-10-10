@@ -5,11 +5,11 @@
   margin: 0 0 10px 10px;
   background-color: #bfbfbf;
   border: 2px solid #000;
+  padding: 12px;
 }
 
 h2,
 p {
-  font-family: "Courier New", Courier, monospace;
   color: #000;
   margin: 0;
   padding: 0px 0px 6px 0px;
@@ -38,12 +38,80 @@ p {
   align-items: center;
   flex-direction: column;
   justify-content: start;
-  margin-bottom: 15px;
   font-weight: normal;
+  margin-bottom: 15px;
 
   p {
     color: black;
   }
+}
+
+.pokemon_stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pokemon_button {
+  text-align: center;
+  width: 100px;
+  height: 30px;
+  border: #fff 2px solid;
+  background-color: green;
+}
+
+/* CSS */
+.pokemon_button {
+  margin: 0 auto;
+  display: block;
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 3px 5px -1px,
+    rgba(0, 0, 0, 0.14) 0 6px 10px 0, rgba(0, 0, 0, 0.12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  fill: currentcolor;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: 0.25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform, opacity;
+  z-index: 0;
+}
+
+.pokemon_button:hover {
+  background: #f6f9fe;
+  color: #174ea6;
+}
+
+.pokemon_button:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%),
+    0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.pokemon_button:focus {
+  outline: none;
+  border: 2px solid #4285f4;
 }
 
 input {
