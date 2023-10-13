@@ -10,8 +10,10 @@ import { useAppDispatch } from "../../redux/store";
 import {
   fetchPokemons,
   selectPokemonData,
+  setRandomPokemon,
 } from "../../redux/slices/pokemonSlice";
 import { setQuery } from "../../redux/slices/querySlice";
+import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,11 +25,13 @@ const Home: React.FC = () => {
   };
 
   const onFightButtonClick = () => {
-    if (pokemons && choosenPokemon) {
-      const randomPokemon = Math.floor(Math.random() * pokemons.length);
-    } else {
-      alert("Сначала выберите покемона!");
+    const random = Math.floor(Math.random() * pokemons.length);
+    let randomPokemon = pokemons[random];
+    if (randomPokemon.name === choosenPokemon?.name) {
+      randomPokemon = pokemons[random - 1];
     }
+    dispatch(setRandomPokemon(randomPokemon));
+    alert("Начало боя");
   };
 
   const onChangeInput = (query: string) => {
@@ -43,10 +47,15 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <button onClick={onFightButtonClick} className={styles.fight_button}>
-        Бой!
-      </button>
+    <>
+      {choosenPokemon && (
+        <Link to="/fight">
+          <button onClick={onFightButtonClick} className={styles.fight_button}>
+            Бой!
+          </button>
+        </Link>
+      )}
+
       <input
         className={styles.effect_1}
         type="text"
@@ -62,7 +71,7 @@ const Home: React.FC = () => {
           />
         )}
       </div>
-    </div>
+    </>
   );
 };
 

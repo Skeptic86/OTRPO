@@ -35,6 +35,7 @@ interface IPokemonSliceState {
   pokemons: IPokemon[];
   status: Status;
   choosenPokemon?: IPokemon;
+  randomPokemon?: IPokemon;
 }
 
 const initialState: IPokemonSliceState = {
@@ -46,12 +47,14 @@ export const pokemonSlice = createSlice({
   name: "pokemon",
   initialState,
   reducers: {
-    setpokemons(state, action: PayloadAction<IPokemon[]>) {
+    setPokemons(state, action: PayloadAction<IPokemon[]>) {
       state.pokemons = action.payload;
     },
-    choosePokemon(state, action: PayloadAction<IPokemon>) {
+    setChosenPokemon(state, action: PayloadAction<IPokemon>) {
       state.choosenPokemon = action.payload;
-      console.log(state.choosenPokemon);
+    },
+    setRandomPokemon(state, action: PayloadAction<IPokemon>) {
+      state.randomPokemon = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -76,9 +79,8 @@ export const pokemonSlice = createSlice({
 });
 
 export const selectPokemonData = (state: RootState) => state.pokemon;
-export const selectChoosenPokemon = (state: RootState) =>
-  state.pokemon.choosenPokemon;
 // Action creators are generated for each case reducer function
-export const { setpokemons, choosePokemon } = pokemonSlice.actions;
+export const { setPokemons, setChosenPokemon, setRandomPokemon } =
+  pokemonSlice.actions;
 
 export default pokemonSlice.reducer;

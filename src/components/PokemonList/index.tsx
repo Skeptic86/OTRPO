@@ -7,10 +7,7 @@ import PokemonCard from "../PokemonCard";
 import { useDispatch, useSelector } from "react-redux";
 import { selectQuery } from "../../redux/slices/querySlice";
 import { useAppDispatch } from "../../redux/store";
-import {
-  choosePokemon,
-  selectChoosenPokemon,
-} from "../../redux/slices/pokemonSlice";
+import { setChosenPokemon } from "../../redux/slices/pokemonSlice";
 
 const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
@@ -29,7 +26,7 @@ const Items: React.FC<IItemsProps> = ({ currentItems }) => {
   const { query } = useSelector(selectQuery);
 
   const onPokemonButtonClick = (pokemon: IPokemon) => {
-    dispatch(choosePokemon(pokemon));
+    dispatch(setChosenPokemon(pokemon));
   };
 
   return (
