@@ -1,0 +1,9 @@
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.container {
+  font-family: sans-serif;
+  font-size: 24px;
+  margin: 0 auto;
+  max-width: 1200px;
+}
