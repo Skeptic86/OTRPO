@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styles from './Home.module.scss';
 import IPokemon from '../../types/pokemon.interface';
-import IResult from '../../types/result.interface';
-import PokemonCard from '../../components/PokemonCard';
 import PokemonList from '../../components/PokemonList';
 import { useAppDispatch } from '../../redux/store';
 import {
+  Status,
   fetchPokemons,
   selectPokemonData,
-  setRandomPokemon,
+  setRandomPokemon
 } from '../../redux/slices/pokemonSlice';
 import { selectQuery, setQuery } from '../../redux/slices/querySlice';
 import { Link } from 'react-router-dom';
@@ -21,9 +20,12 @@ const Home: React.FC = () => {
   const { pokemons, status, choosenPokemon } = useSelector(selectPokemonData);
 
   const [currentPage, setCurrentPage] = React.useState<number>(0);
-  const getPokemons = async (limit: number = 100) => {
-    dispatch(fetchPokemons({ limit }));
-  };
+  const getPokemons = useCallback(
+    async (limit: number = 100) => {
+      dispatch(fetchPokemons({ limit }));
+    },
+    [dispatch]
+  );
 
   const onFightButtonClick = () => {
     const random = Math.floor(Math.random() * pokemons.length);
@@ -40,11 +42,15 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     getPokemons();
-  }, []);
+  }, [getPokemons]);
 
   const onChangePage = (page: number) => {
     setCurrentPage(page);
   };
+
+  const foundPokemons = pokemons.filter((pokemon: IPokemon) => {
+    return pokemon.name.toLowerCase().includes(query.toLowerCase());
+  });
 
   return (
     <>
@@ -61,11 +67,15 @@ const Home: React.FC = () => {
         type="text"
         value={query}
         placeholder="Enter Pokemon Name"
-        onChange={(event) => onChangeInput(event.target.value)}
+        onChange={event => onChangeInput(event.target.value)}
       />
       <div className={styles.pokemons}>
-        {pokemons && (
-          <PokemonList pokemons={pokemons} currentPage={currentPage} onChangePage={onChangePage} />
+        {status === Status.SUCCESS && (
+          <PokemonList
+            pokemons={foundPokemons}
+            currentPage={currentPage}
+            onChangePage={onChangePage}
+          />
         )}
       </div>
     </>
