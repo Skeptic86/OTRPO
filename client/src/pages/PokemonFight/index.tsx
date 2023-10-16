@@ -17,8 +17,12 @@ const PokemonFight: React.FC = () => {
   const { pokemons, status, choosenPokemon, randomPokemon } = useSelector(selectPokemonData);
 
   const [attackInput, setAttackInput] = useState<string>('');
-  const [choosenPokemonHP, setChoosenPokemonHP] = useState<number>(0);
-  const [randomPokemonHP, setRandomPokemonHP] = useState<number>(0);
+  const [choosenPokemonHP, setChoosenPokemonHP] = useState<number>(
+    choosenPokemon?.stats[0].base_stat || 1
+  );
+  const [randomPokemonHP, setRandomPokemonHP] = useState<number>(
+    randomPokemon?.stats[0].base_stat || 1
+  );
   const [choosenPokemonAttack, setChoosenPokemonAttack] = useState<number>(0);
   const [randomPokemonAttack, setRandomPokemonAttack] = useState<number>(0);
   const [winnerPokemon, setWinnerPokemon] = useState<IPokemon>();
@@ -41,24 +45,26 @@ const PokemonFight: React.FC = () => {
 
   const pokemonAttack = (isAttackUsers: boolean) => {
     if (isAttackUsers) {
-      setRandomPokemonHP(randomPokemonHP - choosenPokemonAttack);
+      const newHP = randomPokemonHP - choosenPokemonAttack;
+      setRandomPokemonHP(newHP);
       console.log(`pokemonAttack MY: ${choosenPokemonHP}  ${randomPokemonHP}`);
       addToFightResults({
         winner: choosenPokemon?.name,
         winner_hp: choosenPokemonHP,
         loser: randomPokemon?.name,
-        loser_hp: randomPokemonHP,
-        round_number: roundNumber,
+        loser_hp: newHP,
+        round_number: roundNumber
       } as IFightResult);
     } else {
-      setChoosenPokemonHP(choosenPokemonHP - randomPokemonAttack);
+      const newHP = choosenPokemonHP - randomPokemonAttack;
+      setChoosenPokemonHP(newHP);
       console.log(`pokemonAttack ENEMY: ${choosenPokemonHP}  ${randomPokemonHP}`);
       addToFightResults({
         winner: randomPokemon?.name,
         winner_hp: randomPokemonHP,
         loser: choosenPokemon?.name,
-        loser_hp: choosenPokemonHP,
-        round_number: roundNumber,
+        loser_hp: newHP,
+        round_number: roundNumber
       } as IFightResult);
     }
     setRoundNumber(roundNumber + 1);
@@ -66,16 +72,16 @@ const PokemonFight: React.FC = () => {
 
   React.useEffect(() => {
     if (choosenPokemon && randomPokemon) {
-      let _choosenPokemonHP = choosenPokemon?.stats.filter((stat) => {
+      let _choosenPokemonHP = choosenPokemon?.stats.filter(stat => {
         return stat.stat.name === StatsEnum.HP;
       });
-      let _randomPokemonHP = randomPokemon?.stats.filter((stat) => {
+      let _randomPokemonHP = randomPokemon?.stats.filter(stat => {
         return stat.stat.name === StatsEnum.HP;
       });
-      let _choosenPokemonAttack = choosenPokemon?.stats.filter((stat) => {
+      let _choosenPokemonAttack = choosenPokemon?.stats.filter(stat => {
         return stat.stat.name === StatsEnum.ATTACK;
       });
-      let _randomPokemonAttack = randomPokemon?.stats.filter((stat) => {
+      let _randomPokemonAttack = randomPokemon?.stats.filter(stat => {
         return stat.stat.name === StatsEnum.ATTACK;
       });
 
@@ -85,6 +91,10 @@ const PokemonFight: React.FC = () => {
       setRandomPokemonAttack(_randomPokemonAttack![0].base_stat);
     }
   }, []);
+
+  React.useEffect(() => {
+    isFightEnd();
+  }, [choosenPokemonHP, randomPokemonHP]);
 
   const isFightEnd = () => {
     console.log(`isFightEnd: ${choosenPokemonHP}  ${randomPokemonHP}`);
@@ -123,25 +133,23 @@ const PokemonFight: React.FC = () => {
     } else {
       pokemonAttack(false);
     }
-    isFightEnd();
   };
 
   const handleQuickFight = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const _choosenPokemonHP = choosenPokemonHP;
-    const _randomPokemonHP = randomPokemonHP;
+    let _choosenPokemonHP = choosenPokemonHP;
+    let _randomPokemonHP = randomPokemonHP;
     while (_choosenPokemonHP > 0 && _randomPokemonHP > 0) {
       const attackRandomNumber = getRandomInt(1, 10);
       const attackChosenNumber = getRandomInt(1, 10);
       if (attackChosenNumber % 2 === attackRandomNumber % 2) {
-        console.log(_choosenPokemonHP);
+        _randomPokemonHP -= choosenPokemonAttack;
         pokemonAttack(true);
       } else {
-        console.log(_randomPokemonHP);
+        _choosenPokemonHP -= randomPokemonAttack;
         pokemonAttack(false);
       }
     }
-    isFightEnd();
   };
 
   return (
@@ -169,7 +177,7 @@ const PokemonFight: React.FC = () => {
                 type="number"
                 placeholder="Введите число от 1 до 10"
                 value={attackInput}
-                onChange={(e) => onChangeInput(e)}
+                onChange={e => onChangeInput(e)}
               />
               <div className={styles.buttons}>
                 <button className={styles.pokemon_button} type="submit" onClick={handleFight}>
