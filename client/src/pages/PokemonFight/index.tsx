@@ -43,6 +43,19 @@ const PokemonFight: React.FC = () => {
     setAttackInput(e.target.value);
   };
 
+  const sendEmail = async (winner: IPokemon) => {
+    const text = `Победил ${winner.name}`;
+    console.log(text);
+    await axios
+      .post('/send-email', { to: 'sizer1337228@gmail.com', subject: 'pokemon fight result', text })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
   const pokemonAttack = (isAttackUsers: boolean) => {
     if (isAttackUsers) {
       const newHP = randomPokemonHP - choosenPokemonAttack;
@@ -96,20 +109,20 @@ const PokemonFight: React.FC = () => {
     isFightEnd();
   }, [choosenPokemonHP, randomPokemonHP]);
 
-  const isFightEnd = () => {
+  const isFightEnd = async () => {
     console.log(`isFightEnd: ${choosenPokemonHP}  ${randomPokemonHP}`);
     if (randomPokemonHP <= 0) {
       setWinnerPokemon(choosenPokemon);
-      // axios.post('https://localhost:5000/api/fightResult', {
-      //   winner: choosenPokemon?.name,
-      //   loser: randomPokemon?.name,
-      // });
+      await axios.post('http://localhost:5000/api/result', {
+        winner: choosenPokemon?.name,
+        loser: randomPokemon?.name
+      });
     } else if (choosenPokemonHP <= 0) {
       setWinnerPokemon(randomPokemon);
-      // axios.post('https://localhost:5000/api/fightResult', {
-      //   winner: randomPokemon?.name,
-      //   loser: choosenPokemon?.name,
-      // });
+      await axios.post('http://localhost:5000/api/result', {
+        winner: randomPokemon?.name,
+        loser: choosenPokemon?.name
+      });
     }
   };
 
@@ -149,6 +162,11 @@ const PokemonFight: React.FC = () => {
         _choosenPokemonHP -= randomPokemonAttack;
         pokemonAttack(false);
       }
+    }
+    if (_choosenPokemonHP <= 0) {
+      sendEmail(randomPokemon!);
+    } else {
+      sendEmail(choosenPokemon!);
     }
   };
 
