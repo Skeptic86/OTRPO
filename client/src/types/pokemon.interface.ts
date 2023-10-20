@@ -1,7 +1,7 @@
 export default interface IPokemon {
   abilities: IAbilities[];
   base_experience: number;
-  forms: object[];
+  forms: IForm[];
   game_indices: object[];
   height: number;
   weight: number;
@@ -14,7 +14,7 @@ export default interface IPokemon {
   species: object;
   sprites: ISprites;
   stats: IStats[];
-  types: object[];
+  types: IType[];
 }
 
 export interface IStats {
@@ -23,6 +23,19 @@ export interface IStats {
   stat: {
     name: string;
   };
+}
+
+interface IType {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+interface IForm {
+  name: string;
+  url: string;
 }
 
 interface ISprites {
