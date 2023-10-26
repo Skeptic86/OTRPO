@@ -75,6 +75,7 @@ p {
 /* CSS */
 .pokemon_button {
   margin: 0 auto;
+  margin-bottom: 15px;
   display: block;
   align-items: center;
   appearance: none;
@@ -141,4 +142,26 @@ input {
   border: 0;
   padding: 7px 0;
   border-bottom: 1px solid #ccc;
+}
+
+.comment_card {
+  width: 500px;
+  max-height: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+
+  &_line {
+    font-size: 14px;
+    font-weight: normal;
+    text-align: center;
+  }
+
+  &_header {
+    font-size: 18px;
+    font-weight: normal;
+    text-align: center;
+  }
 }
