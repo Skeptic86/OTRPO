@@ -6,13 +6,41 @@ import { IPokemonCardProps } from '../../components/PokemonCard';
 import { selectPokemonData } from '../../redux/slices/pokemonSlice';
 
 import styles from './PokemonFullCard.module.scss';
+import axios from 'axios';
 
 const PokemonFullCard: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pokemons } = useSelector(selectPokemonData);
-
+  const [login, setLogin] = React.useState<string>('');
+  const [password, setPassword] = React.useState<string>('');
   const pokemon = pokemons.filter(pokemon => pokemon.id === parseInt(id!))[0];
+
+  const onChangeInput1 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLogin(e.target.value);
+  };
+
+  const onChangeInput2 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const savePokemonFTP = async () => {
+    const name = pokemon.name;
+    if (login && password) {
+      await axios
+        .post('/save-pokemon', {
+          name: name
+        })
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    } else {
+      alert('Введите логин и пароль!');
+    }
+  };
 
   return (
     <div className={styles.card}>
@@ -36,6 +64,25 @@ const PokemonFullCard: React.FC = () => {
           <p key={i} className={styles.pokemon_ability}>{`Тип ${i + 1}: ${types.type.name}`}</p>
         ))}
       </div>
+      <form className={styles.fight_form}>
+        <input
+          className={styles.effect_1}
+          type="text"
+          placeholder="Логин"
+          value={login}
+          onChange={e => onChangeInput1(e)}
+        />
+        <input
+          className={styles.effect_1}
+          type="text"
+          placeholder="Пароль"
+          value={password}
+          onChange={e => onChangeInput2(e)}
+        />
+        <button className={styles.pokemon_button} type="submit" onClick={savePokemonFTP}>
+          Сохранить
+        </button>
+      </form>
       <button onClick={() => navigate('/')} className={styles.pokemon_button}>
         Назад
       </button>
