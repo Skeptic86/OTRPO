@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import ChooseIconForStat from '../../components/ChooseIconForStat';
 import { IPokemonCardProps } from '../../components/PokemonCard';
 import { selectPokemonData } from '../../redux/slices/pokemonSlice';
 import StarRatings from 'react-star-ratings';
+import IPokemon from '../../types/pokemon.interface';
 
 import styles from './PokemonFullCard.module.scss';
 import axios from 'axios';
@@ -23,7 +24,20 @@ const PokemonFullCard: React.FC = () => {
   const [commentList, setCommentList] = React.useState<IComment[]>([]);
   const [comment, setComment] = React.useState<string>('');
   const [rating, setRating] = React.useState<number>(1);
+  const [pokemonApi, setPokemonApi] = React.useState<IPokemon>();
   const pokemon = pokemons.filter(pokemon => pokemon.id === parseInt(id!))[0];
+
+  const fetchPokemonById = async (num: number) => {
+    const url = `/redis/${num}`;
+    const { data } = await axios.get<IPokemon>(url);
+    setPokemonApi(data);
+    console.log(data);
+    return data;
+  };
+
+  useEffect(() => {
+    fetchPokemonById(pokemon.id);
+  }, []);
 
   const onChangeInput1 = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLogin(e.target.value);
@@ -37,10 +51,8 @@ const PokemonFullCard: React.FC = () => {
     setComment(e.target.value);
   };
 
-  const onAddCommentButton = (e: React.ChangeEvent<HTMLInputElement>) => {};
-
   const savePokemonFTP = async () => {
-    const name = pokemon.name;
+    const name = pokemonApi?.name;
     if (login && password) {
       await axios
         .post('/save-pokemon', {
@@ -69,32 +81,32 @@ const PokemonFullCard: React.FC = () => {
     }
   };
 
-  if (!pokemon) return null;
+  if (!pokemonApi) return null;
 
   return (
     <>
       <div className={styles.card}>
         <img
           className={styles.pokemon_img}
-          src={pokemon.sprites?.front_default!}
+          src={pokemonApi?.sprites?.front_default!}
           alt="pokemon_img"
         />
-        <h2 className={styles.pokemon_name}>{pokemon.name}</h2>
+        <h2 className={styles.pokemon_name}>{pokemonApi?.name}</h2>
         <div className={styles.pokemon_info}>
-          {pokemon.abilities.map((ability, i) => (
+          {pokemonApi?.abilities.map((ability, i) => (
             <p key={i} className={styles.pokemon_ability}>{`Способность ${i + 1}: ${
               ability.ability.name
             }`}</p>
           ))}
           <div className={styles.pokemon_stats}>
-            {pokemon.stats.map((stat, i) => (
+            {pokemonApi?.stats.map((stat, i) => (
               <ChooseIconForStat key={i} stat={stat} />
             ))}
           </div>
-          {pokemon.forms.map((form, i) => (
+          {pokemonApi?.forms.map((form, i) => (
             <p key={i} className={styles.pokemon_ability}>{`Форма ${i + 1}: ${form.name}`}</p>
           ))}
-          {pokemon.types.map((types, i) => (
+          {pokemonApi?.types.map((types, i) => (
             <p key={i} className={styles.pokemon_ability}>{`Тип ${i + 1}: ${types.type.name}`}</p>
           ))}
         </div>
