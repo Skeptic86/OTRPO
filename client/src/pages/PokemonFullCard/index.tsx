@@ -36,7 +36,7 @@ const PokemonFullCard: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPokemonById(pokemon.id);
+    fetchPokemonById(parseInt(id!));
   }, []);
 
   const onChangeInput1 = (e: React.ChangeEvent<HTMLInputElement>) => {

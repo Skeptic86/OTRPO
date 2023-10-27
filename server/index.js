@@ -1,37 +1,43 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const pokemonRouter = require('./routes/pokemon.routes');
-const cors = require('cors');
-const fs = require('fs');
+const express = require("express");
+const nodemailer = require("nodemailer");
+const pokemonRouter = require("./routes/pokemon.routes");
+const cors = require("cors");
+const fs = require("fs");
 const PORT = 5000;
-const axios = require('axios');
-const redis = require('redis');
+const axios = require("axios");
+const redis = require("redis");
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use('/api', pokemonRouter);
+app.use("/api", pokemonRouter);
 
-const redisClient = redis.createClient(6379);
+(async () => {
+  redisClient = redis.createClient(6379);
 
-var ftpClient = require('ftp-client'),
+  redisClient.on("error", (error) => console.log("Что-то пошло не так", error)); // вешаем хук на ошибку подключения к серверу Redis
+
+  await redisClient.connect(); // подключаемся к серверу
+})();
+
+var ftpClient = require("ftp-client"),
   config = {
-    host: 'ftpupload.net',
+    host: "ftpupload.net",
     port: 21,
-    user: 'ezyro_35295053',
-    password: '8b4bdac145760',
+    user: "ezyro_35295053",
+    password: "8b4bdac145760",
   },
   options = {
-    logging: 'basic',
+    logging: "basic",
   },
   client = new ftpClient(config, options);
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.yandex.ru',
+  host: "smtp.yandex.ru",
   port: 465,
   secure: true,
   auth: {
-    user: 'stud0000245135@study.utmn.ru', // Ваш email
-    pass: 'fcxyxkcdoopvfeby', // Ваш пароль
+    user: "stud0000245135@study.utmn.ru", // Ваш email
+    pass: "fcxyxkcdoopvfeby", // Ваш пароль
   },
 });
 
@@ -73,38 +79,73 @@ const transporter = nodemailer.createTransport({
 
 // app.get('/redis/:id', getPokemon);
 
-app.get('/redis/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const redisKey = `pokemon:${id}`;
-
-    // Попытаться получить данные из Redis
-    redisClient.get(redisKey, async (err, data) => {
-      if (err) throw err;
-
-      if (data) {
-        // Если данные уже есть в Redis, вернуть их
-        const pokemonData = JSON.parse(data);
-        res.json(pokemonData);
-      } else {
-        // Если данных нет в Redis, выполнить запрос к API
-        const apiUrl = `https://pokeapi.co/api/v2/pokemon/${id}`;
-        const response = await axios.get(apiUrl);
-        const pokemonData = response.data;
-
-        // Сохранить данные в Redis с TTL (временем жизни) в секундах
-        redisClient.setex(redisKey, 3600, JSON.stringify(pokemonData));
-
-        res.json(pokemonData);
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Ошибка при получении данных Pokemon' });
-  }
+redisClient.on("connect", () => {
+  console.log("Connected to Redis");
 });
 
-app.post('/save-pokemon', (req, res) => {
+redisClient.on("error", (err) => {
+  console.error("Error Redis: ", err);
+});
+
+async function getPokemons(number) {
+  const apiUrl = `https://pokeapi.co/api/v2/pokemon/${number}`;
+  const { data } = await axios.get(apiUrl);
+  return data;
+}
+
+app.get("/redis/:id", async (req, res) => {
+  console.log("get");
+  console.log(req.params);
+  const { id } = req.params;
+  console.log(id);
+  const redisKey = `pokemon:${id}`;
+  console.log("try get");
+  // Попытаться получить данные из Redis
+  const cacheData = await redisClient.get(redisKey);
+  if (cacheData) {
+    results = JSON.parse(cacheData);
+  } else {
+    results = await getPokemons(id);
+    if (results.length === 0) throw "API error"; // обрабатываем пустой результат ошибкой
+    await redisClient.set(redisKey, JSON.stringify(results));
+  }
+
+  res.json(results);
+});
+
+// создаем асинхронную функцию для запроса данных с удаленного сервера с помощью axios
+
+async function getRemoteData() {
+  const information = await axios.get(
+    `https://jsonplaceholder.typicode.com/posts/1`
+  ); // отправляем  запрос на удаленный сервер с API
+  console.log("There was a request to a remote server"); // выводим информационное сообщение в консоль
+  return information.data; // возвращаем полученные JSON-данные в сыром виде
+}
+
+// создаем асинхронную функция обработки пользовательских запросов
+
+async function onRequest(req, res) {
+  let results; // заранее объявляем переменную для результата
+
+  const cacheData = await redisClient.get("post"); // пытаемся получить переменную post из базы данных Redis
+
+  if (cacheData) {
+    results = JSON.parse(cacheData); // парсим данные из формата сырой строки в формат структуры
+  } else {
+    results = await getRemoteData(); // вызываем функцию получения данных с удаленного сервера
+    if (results.length === 0) throw "API error"; // обрабатываем пустой результат ошибкой
+    await redisClient.set("post", JSON.stringify(results)); // кэшируем полученные данные
+  }
+
+  res.send(results); // отвечаем на запрос JSON-данными
+}
+
+// запускаем HTTP-сервер с необходимыми настройками
+
+// app.get("/test", onRequest); // вешаем ранее созданную функцию на хук GET-запроса
+
+app.post("/save-pokemon", (req, res) => {
   const { name } = req.body;
   console.log(`saving ${name}`);
   const date = getDate();
@@ -117,20 +158,20 @@ app.post('/save-pokemon', (req, res) => {
 
   fs.appendFile(`${dir}/${name}.md`, `# ${name}`, function (err) {
     if (err) throw err;
-    console.log('File is created successfully.');
+    console.log("File is created successfully.");
   });
 
   client.connect(function () {
     client.upload(
-      ['test/**'],
-      '/htdocs',
+      ["test/**"],
+      "/htdocs",
       {
-        baseDir: 'htdocs',
-        overwrite: 'older',
+        baseDir: "htdocs",
+        overwrite: "older",
       },
       function (result) {
         console.log(result);
-      },
+      }
     );
 
     // client.download(
@@ -146,10 +187,10 @@ app.post('/save-pokemon', (req, res) => {
   });
 });
 
-app.post('/send-email', (req, res) => {
+app.post("/send-email", (req, res) => {
   const { to, subject, text } = req.body;
   const mailOptions = {
-    from: 'stud0000245135@study.utmn.ru',
+    from: "stud0000245135@study.utmn.ru",
     to,
     subject,
     text,
@@ -158,10 +199,10 @@ app.post('/send-email', (req, res) => {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
-      res.status(500).send('Ошибка отправки письма');
+      res.status(500).send("Ошибка отправки письма");
     } else {
-      console.log('Email отправлен: ' + info.response);
-      res.send('Email отправлен успешно');
+      console.log("Email отправлен: " + info.response);
+      res.send("Email отправлен успешно");
     }
   });
 });
@@ -173,7 +214,7 @@ const getDate = () => {
   let date = date_ob.getDate();
   let month = date_ob.getMonth() + 1;
   let year = date_ob.getFullYear();
-  const returnDate = year + '-' + month + '-' + date;
+  const returnDate = year + "-" + month + "-" + date;
   return returnDate;
 };
 
