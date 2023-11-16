@@ -73,6 +73,15 @@ const transporter = nodemailer.createTransport({
 
 // app.get('/redis/:id', getPokemon);
 
+// Проверяем соединение с Redis
+redisClient.on('connect', () => {
+  console.log('Подключено к Redis');
+});
+
+redisClient.on('error', (err) => {
+  console.error('Ошибка подключения к Redis:', err);
+});
+
 app.get('/redis/:id', async (req, res) => {
   try {
     const { id } = req.params;
