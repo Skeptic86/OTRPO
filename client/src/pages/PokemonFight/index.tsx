@@ -114,14 +114,16 @@ const PokemonFight: React.FC = () => {
     if (randomPokemonHP <= 0) {
       setWinnerPokemon(choosenPokemon);
       await axios.post('http://localhost:5000/api/result', {
-        winner: choosenPokemon?.name,
-        loser: randomPokemon?.name
+        winner_id: choosenPokemon?.id,
+        loser_id: randomPokemon?.id,
+        date_time: new Date().toString()
       });
     } else if (choosenPokemonHP <= 0) {
       setWinnerPokemon(randomPokemon);
       await axios.post('http://localhost:5000/api/result', {
-        winner: randomPokemon?.name,
-        loser: choosenPokemon?.name
+        winner_id: randomPokemon?.id,
+        loser_id: choosenPokemon?.id,
+        date_time: new Date().toString()
       });
     }
   };
