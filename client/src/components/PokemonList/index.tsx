@@ -33,6 +33,7 @@ const Items: React.FC<IItemsProps> = ({ currentItems }) => {
       <div className={styles.pokemon_wrapper__inner}>
         {currentItems.map(pokemon => (
           <PokemonCard
+            data-testid={pokemon.id}
             onPokemonButtonClick={onPokemonButtonClick}
             key={pokemon.id}
             pokemon={pokemon}

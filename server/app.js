@@ -56,75 +56,83 @@ async function getPokemons(number) {
   return data;
 }
 
-// app.get("/redis/:id", async (req, res) => {
-//   console.log("get");
-//   console.log(req.params);
-//   const { id } = req.params;
-//   console.log(id);
-//   const redisKey = `pokemon:${id}`;
-//   console.log("try get");
-//   // Попытаться получить данные из Redis
-//   const cacheData = await redisClient.get(redisKey);
-//   if (cacheData) {
-//     results = JSON.parse(cacheData);
-//   } else {
-//     results = await getPokemons(id);
-//     if (results.length === 0) throw "API error"; // обрабатываем пустой результат ошибкой
-//     await redisClient.set(redisKey, JSON.stringify(results));
-//   }
+app.get("/redis/:id", async (req, res) => {
+  const { id } = req.params;
+  const redisKey = `pokemon:${id}`;
+  results = await getPokemons(id);
+  if (results.length === 0) throw "API error";
 
-//   res.json(results);
-// });
+  res.json(results);
+});
+
+// Попытаться получить данные из Redis
+// const cacheData = await redisClient.get(redisKey);
+// if (cacheData) {
+//   results = JSON.parse(cacheData);
+// } else {
+//   results = await getPokemons(id);
+//   if (results.length === 0) throw "API error"; // обрабатываем пустой результат ошибкой
+//   await redisClient.set(redisKey, JSON.stringify(results));
+// }
 
 app.post("/save-pokemon", (req, res) => {
   const { name } = req.body;
-  console.log(`saving ${name}`);
-  const date = getDate();
+  if (name) {
+    console.log(`saving ${name}`);
+    const date = getDate();
 
-  var dir = `test/${date}/`;
+    var dir = `test/${date}/`;
 
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+    // if (!fs.existsSync(dir)) {
+    //   fs.mkdirSync(dir);
+    // }
+
+    // fs.appendFile(`${dir}/${name}.md`, `# ${name}`, function (err) {
+    //   if (err) throw err;
+    //   console.log("File is created successfully.");
+    // });
+
+    // client.connect(function () {
+    //   client.upload(
+    //     ["test/**"],
+    //     "/htdocs",
+    //     {
+    //       baseDir: "htdocs",
+    //       overwrite: "older",
+    //     },
+    //     function (result) {
+    //       console.log(result);
+    //     }
+    //   );
+    // });
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(400);
   }
-
-  fs.appendFile(`${dir}/${name}.md`, `# ${name}`, function (err) {
-    if (err) throw err;
-    console.log("File is created successfully.");
-  });
-
-  client.connect(function () {
-    client.upload(
-      ["test/**"],
-      "/htdocs",
-      {
-        baseDir: "htdocs",
-        overwrite: "older",
-      },
-      function (result) {
-        console.log(result);
-      }
-    );
-  });
 });
 
 app.post("/send-email", (req, res) => {
   const { to, subject, text } = req.body;
-  const mailOptions = {
-    from: "stud0000245135@study.utmn.ru",
-    to,
-    subject,
-    text,
-  };
+  if (to && subject && text) {
+    const mailOptions = {
+      from: "stud0000245135@study.utmn.ru",
+      to,
+      subject,
+      text,
+    };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      res.status(500).send("Ошибка отправки письма");
-    } else {
-      console.log("Email отправлен: " + info.response);
-      res.send("Email отправлен успешно");
-    }
-  });
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+        res.status(400).send("Ошибка отправки письма");
+      } else {
+        console.log("Email отправлен: " + info.response);
+        res.status(200).send("Email отправлен успешно");
+      }
+    });
+  } else {
+    res.sendStatus(400);
+  }
 });
 
 const getDate = () => {
