@@ -148,10 +148,8 @@ const PokemonFullCard: React.FC = () => {
         </button>
         {commentList.map((item, i) => {
           return (
-            <div className={styles.comment_card}>
-              <p key={i} className={styles.comment_card_line}>
-                {item.message}
-              </p>
+            <div key={i} className={styles.comment_card}>
+              <p className={styles.comment_card_line}>{item.message}</p>
               <StarRatings numberOfStars={5} rating={item.star_count} />
             </div>
           );

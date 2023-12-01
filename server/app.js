@@ -2,8 +2,10 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const pokemonRouter = require("./routes/pokemon.routes");
 const cors = require("cors");
+// const bcrypt = require("bcrypt");
+// const jwt = require("jsonwebtoken");
+// const speakeasy = require("speakeasy");
 const fs = require("fs");
-const PORT = 5000;
 const axios = require("axios");
 // const redis = require("redis");
 const app = express();
@@ -11,6 +13,8 @@ require("dotenv").config();
 app.use(express.json());
 app.use(cors());
 app.use("/api", pokemonRouter);
+
+const secretKey = process.env.JWT_KEY;
 
 // (async () => {
 //   redisClient = redis.createClient(6379);
