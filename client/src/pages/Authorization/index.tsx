@@ -28,10 +28,21 @@ const Authorization = () => {
   };
 
   React.useEffect(() => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const codeParam = urlParams.get('code');
     if (localStorage.getItem('token')) {
       checkAuth();
     }
   }, []);
+
+  React.useEffect(() => {}, []);
+
+  const CLIENT_ID = '655c5f2e13624fe8a548';
+
+  const loginWithGithub = () => {
+    window.location.assign('https://github.com/login/oauth/authorize?client_id=' + CLIENT_ID);
+  };
 
   return (
     <div>
@@ -41,6 +52,7 @@ const Authorization = () => {
           : 'Пользователь не авторизован'}
       </h1>
       <LoginForm />
+      <button onClick={() => loginWithGithub()}>Login with GitHub</button>
       <Link to="/home">
         <button>Пропустить авторизацию</button>
       </Link>
