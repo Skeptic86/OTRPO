@@ -12,12 +12,16 @@ import {
   setRandomPokemon
 } from '../../redux/slices/pokemonSlice';
 import { selectQuery, setQuery } from '../../redux/slices/querySlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthService from '../../services/AuthService';
+import { IUser } from '../../../models/IUser';
+import { setIsAuth, setUser } from '../../redux/slices/authSlice';
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
   const { query } = useSelector(selectQuery);
   const { pokemons, status, choosenPokemon } = useSelector(selectPokemonData);
+  const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = React.useState<number>(0);
   const getPokemons = useCallback(
@@ -26,6 +30,19 @@ const Home: React.FC = () => {
     },
     [dispatch]
   );
+
+  const logout = async () => {
+    try {
+      const response = await AuthService.logout();
+      console.log(response);
+      localStorage.removeItem('token');
+      dispatch(setIsAuth(false));
+      dispatch(setUser({} as IUser));
+      navigate('/');
+    } catch (e: any) {
+      console.log(e.response?.data?.message);
+    }
+  };
 
   const onFightButtonClick = () => {
     const random = Math.floor(Math.random() * pokemons.length);
@@ -61,6 +78,7 @@ const Home: React.FC = () => {
           </button>
         </Link>
       )}
+      <button onClick={() => logout()}>Выйти</button>
 
       <input
         className={styles.effect_1}
