@@ -1,0 +1,66 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - branch_1 # замените на вашу основную ветку
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js (Server)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install Server Dependencies
+        run: |
+          cd server
+          npm install
+
+      - name: Run Server Unit Tests
+        run: |
+          cd server
+          npm test
+
+      - name: Set up Node.js (Client)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install Client Dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: Run Client Unit Tests
+        run: |
+          cd client
+          npm test
+
+      - name: Build and Push Server Docker Image
+        if: success() # выполняется только при успешном прохождении предыдущих шагов
+        env:
+          DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          cd server
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_LOGIN --password-stdin
+          docker build -t ruslanomarov/api-server:latest .
+          docker push ruslanomarov/api-server:latest
+
+      - name: Build and Push Client Docker Image
+        if: success() # выполняется только при успешном прохождении предыдущих шагов
+        env:
+          DOCKER_LOGIN: ${{ secrets.DOCKER_LOGIN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          cd client
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_LOGIN --password-stdin
+          docker build -t ruslanomarov/react-app:latest .
+          docker push ruslanomarov/react-app:latest
