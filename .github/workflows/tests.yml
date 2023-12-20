@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main # замените на вашу основную ветку
+      - branch_1 # замените на вашу основную ветку
 
 jobs:
   build:
